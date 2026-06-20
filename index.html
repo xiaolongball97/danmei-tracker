@@ -35,12 +35,13 @@
   .stat-line .dot{margin:0 8px;color:var(--faint);}
 
   .toolbar{display:flex;align-items:center;gap:10px;margin:32px 0 22px;flex-wrap:wrap;}
-  .search{flex:1;min-width:180px;position:relative;}
+  .search{flex:1;min-width:160px;position:relative;}
   .search input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s;}
   .search input:focus{border-color:var(--accent);}
   .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--faint);}
-  .sort{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);outline:none;}
-  .sort:focus{border-color:var(--accent);}
+  .sort,.shelf{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);outline:none;}
+  .sort:focus,.shelf:focus{border-color:var(--accent);}
+  .shelf{font-weight:500;}
   .btn-add{padding:9px 16px;border:none;border-radius:8px;background:var(--ink);color:#fff;font-size:14px;font-weight:500;transition:opacity .15s,transform .05s;}
   .btn-add:hover{opacity:.88;}
   .btn-add:active{transform:translateY(1px);}
@@ -51,7 +52,6 @@
   .chip.active{background:var(--ink);border-color:var(--ink);color:#fff;}
   .chip .n{opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums;}
 
-  /* ---- gallery cards ---- */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
   .tile{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;transition:transform .14s ease, box-shadow .18s ease;}
   .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-cover);}
@@ -79,7 +79,6 @@
   .empty .mk{font-family:var(--serif);font-size:40px;color:var(--faint);margin-bottom:14px;}
   .empty p{margin:0 0 18px;}
 
-  /* ---- overlays ---- */
   .overlay{position:fixed;inset:0;background:rgba(43,42,39,0.40);display:none;align-items:flex-start;justify-content:center;padding:56px 20px;z-index:50;overflow-y:auto;}
   .overlay.open{display:flex;}
   .modal{width:100%;max-width:520px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:28px;animation:rise .2s ease;}
@@ -105,7 +104,6 @@
   .btn-danger{padding:9px 12px;border:none;border-radius:8px;background:transparent;color:#B5544C;font-size:13px;}
   .btn-danger:hover{background:#B5544C12;}
 
-  /* ---- detail view ---- */
   .detail{max-width:580px;}
   .detail-top{display:flex;gap:22px;}
   .detail-cover{width:170px;flex:none;aspect-ratio:3/4;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-cover);background:linear-gradient(155deg,#fff,#f3edef);}
@@ -132,7 +130,6 @@
   .d-notes{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink);white-space:pre-wrap;line-height:1.6;}
   .detail-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:24px;}
 
-  /* ---- backup + auth ---- */
   .backup{margin-top:44px;display:flex;gap:8px;justify-content:center;align-items:center;font-size:13px;flex-wrap:wrap;}
   .backup button{border:none;background:transparent;color:var(--muted);padding:6px 10px;border-radius:6px;}
   .backup button:hover{color:var(--ink);background:var(--line);}
@@ -179,8 +176,9 @@
   <div class="toolbar">
     <div class="search">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
-      <input id="search" type="text" placeholder="搜索标题、作者、标签…  Search" />
+      <input id="search" type="text" placeholder="搜索…  Search" />
     </div>
+    <select id="shelf" class="shelf" style="display:none"></select>
     <select id="sort" class="sort">
       <option value="updated">Recently updated</option>
       <option value="title">Title A→Z</option>
@@ -205,10 +203,8 @@
   </div>
 </div>
 
-<!-- detail view -->
 <div class="overlay" id="detailOverlay"><div class="modal detail" id="detailCard"></div></div>
 
-<!-- add / edit modal -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2 id="modalTitle">Add novel</h2>
@@ -259,7 +255,6 @@
   </div>
 </div>
 
-<!-- login gate -->
 <div class="gate" id="gate">
   <div class="gate-card">
     <div class="cn">书架</div>
@@ -277,6 +272,7 @@ const LOCAL_KEY = "danmei.library.v1";
 const CLOUD = typeof CONFIG.SUPABASE_URL === "string" && CONFIG.SUPABASE_URL.startsWith("http");
 
 let sb=null, library=[], activeFilter="all", editingId=null;
+let myId=null, shelves=[], currentShelf=null;
 
 function uid(){
   if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -289,20 +285,24 @@ function tval(x){ const t=Date.parse(x.updated); return isNaN(t)?(Number(x.updat
 
 /* ---------- data layer ---------- */
 function toRow(n){
-  return {
+  const row={
     id:n.id, title:n.title, author:n.author||null, status:n.status, cover:n.cover||null,
     current:Number(n.current)||0,
     total:(n.total===null||n.total===undefined||n.total==="")?null:Number(n.total),
     rating:Number(n.rating)||0, url:n.url||null, tags:n.tags||[], notes:n.notes||null,
     updated:n.updated || new Date().toISOString()
   };
+  if(n.owner_id) row.owner_id=n.owner_id;   // omit when absent so the DB default fills it
+  return row;
 }
 function saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(library)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(LOCAL_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
 async function dataLoad(){
   if(CLOUD){
-    const {data,error}=await sb.from('novels').select('*');
-    if(error){ alert("Couldn't load your shelf: "+error.message); return; }
+    let query=sb.from('novels').select('*');
+    if(currentShelf) query=query.eq('owner_id',currentShelf);
+    const {data,error}=await query;
+    if(error){ alert("Couldn't load that shelf: "+error.message); return; }
     library=data||[];
   }else{ library=loadLocal(); }
 }
@@ -326,7 +326,22 @@ async function uploadCover(file){
   }
 }
 
-/* ---------- covers (safe fallback, no inline-string mess) ---------- */
+/* ---------- shelves ---------- */
+async function loadShelves(){
+  shelves=[{id:myId,label:"My shelf"}];
+  const {data}=await sb.from('collaborators').select('owner_id').eq('member_id',myId);
+  const shared=(data||[]).filter(r=>r.owner_id && r.owner_id!==myId);
+  shared.forEach((r,i)=> shelves.push({id:r.owner_id, label: shared.length>1 ? ("Shared shelf "+(i+1)) : "Shared shelf"}));
+}
+function populateShelves(){
+  const sel=document.getElementById('shelf');
+  if(!CLOUD || shelves.length<=1){ sel.style.display='none'; return; }
+  sel.style.display='';
+  sel.innerHTML=shelves.map(s=>`<option value="${s.id}">${s.label}</option>`).join('');
+  sel.value=currentShelf;
+}
+
+/* ---------- covers ---------- */
 function coverMarkup(n){
   if(n.cover) return `<img class="cover-img" src="${escapeAttr(n.cover)}" data-ph="${escapeAttr(n.title)}" alt="" loading="lazy" />`;
   return `<div class="cover-ph"><span>${escapeHtml(n.title)}</span></div>`;
@@ -377,7 +392,7 @@ function renderGrid(){
   const list=document.getElementById("list");
   const items=currentView();
   if(library.length===0){
-    list.className=""; list.innerHTML=`<div class="empty"><div class="mk">书</div><p>Your shelf is empty. Add the first novel you're reading.</p><button class="btn-add" onclick="openModal()">+ Add novel</button></div>`;
+    list.className=""; list.innerHTML=`<div class="empty"><div class="mk">书</div><p>This shelf is empty. Add the first novel.</p><button class="btn-add" onclick="openModal()">+ Add novel</button></div>`;
     return;
   }
   if(items.length===0){ list.className=""; list.innerHTML=`<div class="empty"><p>No novels match that.</p></div>`; return; }
@@ -409,7 +424,7 @@ function renderGrid(){
   });
 }
 
-/* ---------- detail view ---------- */
+/* ---------- detail ---------- */
 function openDetail(id){
   const n=library.find(x=>x.id===id); if(!n) return;
   const st=STATUSES[n.status]||{label:n.status};
@@ -433,9 +448,7 @@ function openDetail(id){
           <div class="d-prog-text">${progText}</div>
           <button class="qbtn" data-d="inc">+</button>
         </div>
-        ${bar}
-        ${tags}
-        ${link}
+        ${bar}${tags}${link}
       </div>
     </div>
     ${notes}
@@ -502,13 +515,13 @@ async function saveModal(){
   };
   let target;
   if(editingId){ target=library.find(x=>x.id===editingId); Object.assign(target,data); }
-  else{ target={id:uid(),...data}; library.push(target); }
+  else{ target={id:uid(), ...(CLOUD&&currentShelf?{owner_id:currentShelf}:{}), ...data}; library.push(target); }
   render(); closeModal();
   await persistNovel(target);
 }
 async function deleteCurrent(){
   if(!editingId) return;
-  if(!confirm("Remove this novel from your shelf?")) return;
+  if(!confirm("Remove this novel from the shelf?")) return;
   const id=editingId; library=library.filter(x=>x.id!==id);
   render(); closeModal();
   await removeNovel(id);
@@ -527,8 +540,13 @@ function importData(file){
     try{
       const data=JSON.parse(reader.result);
       if(!Array.isArray(data)) throw new Error("bad");
-      if(library.length && !confirm("Merge the imported novels into your shelf?")) return;
-      for(const raw of data){ const n={id:raw.id||uid(),...raw}; if(!library.find(x=>x.id===n.id)) library.push(n); await persistNovel(n); }
+      if(library.length && !confirm("Merge the imported novels into this shelf?")) return;
+      for(const raw of data){
+        const n={id:raw.id||uid(), ...(CLOUD&&currentShelf?{owner_id:currentShelf}:{}), ...raw};
+        if(CLOUD&&currentShelf) n.owner_id=currentShelf;
+        if(!library.find(x=>x.id===n.id)) library.push(n);
+        await persistNovel(n);
+      }
       render();
     }catch(e){ alert("That file couldn't be read as a backup."); }
   };
@@ -545,8 +563,15 @@ async function doLogin(){
   if(error){ msg.textContent=error.message; return; }
   hideGate(); await afterAuth();
 }
-async function signOut(){ await sb.auth.signOut(); library=[]; render(); showGate(); }
-async function afterAuth(){ await dataLoad(); render(); }
+async function signOut(){ await sb.auth.signOut(); library=[]; shelves=[]; render(); showGate(); }
+async function afterAuth(){
+  const {data:{user}}=await sb.auth.getUser();
+  myId=user?.id||null;
+  await loadShelves();
+  currentShelf=myId;
+  populateShelves();
+  await dataLoad(); render();
+}
 
 /* ---------- wire up ---------- */
 document.getElementById("addBtn").onclick=()=>openModal();
@@ -557,6 +582,7 @@ document.getElementById("overlay").onclick=e=>{ if(e.target.id==="overlay") clos
 document.getElementById("detailOverlay").onclick=e=>{ if(e.target.id==="detailOverlay") closeDetail(); };
 document.getElementById("search").oninput=renderGrid;
 document.getElementById("sort").onchange=renderGrid;
+document.getElementById("shelf").onchange=async e=>{ currentShelf=e.target.value; activeFilter="all"; await dataLoad(); render(); };
 document.getElementById("exportBtn").onclick=exportData;
 document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=""; };
