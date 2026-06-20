@@ -90,6 +90,7 @@
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);background:var(--surface);}
   .field textarea{resize:vertical;min-height:60px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .row3{display:grid;grid-template-columns:0.9fr 1fr 1fr;gap:12px;}
   .cover-row{display:flex;gap:8px;}
   .cover-row input{flex:1;}
   .cover-preview{margin-top:10px;}
@@ -148,6 +149,7 @@
   @media (max-width:560px){
     .wrap{padding:40px 18px 100px;}
     .grid{grid-template-columns:1fr;}
+    .row3{grid-template-columns:1fr;}
     .detail-top{flex-direction:column;align-items:center;text-align:center;}
     .d-prog,.d-tags,.detail-actions{justify-content:center;}
   }
@@ -230,9 +232,12 @@
         </select>
       </div>
     </div>
-    <div class="row2">
-      <div class="field"><label>当前章节 · Current chapter</label><input id="f-current" type="number" min="0" placeholder="0" /></div>
-      <div class="field"><label>总章节 · Total (空白＝连载)</label><input id="f-total" type="number" min="0" placeholder="ongoing" /></div>
+    <div class="row3">
+      <div class="field"><label>单位 · Unit</label>
+        <select id="f-unit"><option value="chapter">章 Chapters</option><option value="page">页 Pages</option></select>
+      </div>
+      <div class="field"><label id="lab-current">当前章节 · Current</label><input id="f-current" type="number" min="0" placeholder="0" /></div>
+      <div class="field"><label id="lab-total">总章节 · Total (空白＝连载)</label><input id="f-total" type="number" min="0" placeholder="—" /></div>
     </div>
     <div class="row2">
       <div class="field"><label>评分 · Rating</label>
@@ -283,16 +288,30 @@ function escapeAttr(s){return escapeHtml(s);}
 function pct(n){ if(!n.total||n.total<=0) return null; return Math.min(100,Math.round((n.current/n.total)*100)); }
 function tval(x){ const t=Date.parse(x.updated); return isNaN(t)?(Number(x.updated)||0):t; }
 
+/* ---------- unit + progress labels ---------- */
+function unitChar(n){ return n.unit==='page' ? '页' : '章'; }
+function progPlain(n){
+  const u=unitChar(n);
+  if(n.total&&n.total>0) return `第 ${n.current||0} / ${n.total} ${u} · ${pct(n)}%`;
+  return n.unit==='page' ? `第 ${n.current||0} 页` : `第 ${n.current||0} ${u} · 连载中`;
+}
+function progRich(n){
+  const u=unitChar(n);
+  if(n.total&&n.total>0) return `第 <b>${n.current||0}</b> / ${n.total} ${u} · ${pct(n)}%`;
+  return n.unit==='page' ? `第 <b>${n.current||0}</b> 页` : `第 <b>${n.current||0}</b> ${u} · 连载中`;
+}
+
 /* ---------- data layer ---------- */
 function toRow(n){
   const row={
     id:n.id, title:n.title, author:n.author||null, status:n.status, cover:n.cover||null,
+    unit:n.unit||'chapter',
     current:Number(n.current)||0,
     total:(n.total===null||n.total===undefined||n.total==="")?null:Number(n.total),
     rating:Number(n.rating)||0, url:n.url||null, tags:n.tags||[], notes:n.notes||null,
     updated:n.updated || new Date().toISOString()
   };
-  if(n.owner_id) row.owner_id=n.owner_id;   // omit when absent so the DB default fills it
+  if(n.owner_id) row.owner_id=n.owner_id;
   return row;
 }
 function saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(library)); }catch(e){} }
@@ -363,7 +382,7 @@ function renderStats(){
   const chapters=library.reduce((s,n)=>s+(Number(n.current)||0),0);
   const el=document.getElementById("statLine");
   el.innerHTML = total===0 ? "" :
-    `<b>${total}</b> ${total===1?"novel":"novels"}<span class="dot">·</span><b>${reading}</b> reading<span class="dot">·</span><b>${chapters.toLocaleString()}</b> chapters logged`;
+    `<b>${total}</b> ${total===1?"novel":"novels"}<span class="dot">·</span><b>${reading}</b> reading<span class="dot">·</span><b>${chapters.toLocaleString()}</b> read`;
 }
 function renderFilters(){
   const counts={all:library.length};
@@ -400,19 +419,18 @@ function renderGrid(){
   list.innerHTML=items.map(n=>{
     const p=pct(n), st=STATUSES[n.status]||{label:n.status};
     const bar=(n.total&&n.total>0)?`<div class="tile-bar"><span style="width:${p}%"></span></div>`:"";
-    const ch=(n.total&&n.total>0)?`第 ${n.current||0} / ${n.total} 章 · ${p}%`:`第 ${n.current||0} 章 · 连载中`;
     const tags=(n.tags&&n.tags.length)?`<div class="tile-tags">${n.tags.slice(0,4).map(t=>`<span class="tile-tag">${escapeHtml(t)}</span>`).join("")}</div>`:"";
     return `<div class="tile" data-id="${n.id}">
       <div class="tile-cover">
         ${coverMarkup(n)}
         <span class="tile-pill ${n.status}">${st.label}</span>
-        <button class="tile-quick" data-act="inc" title="+1 chapter">+1 章</button>
+        <button class="tile-quick" data-act="inc" title="+1">+1 ${unitChar(n)}</button>
       </div>
       <div class="tile-body">
         <div class="tile-title">${escapeHtml(n.title)}</div>
         ${n.author?`<div class="tile-sub">${escapeHtml(n.author)}</div>`:""}
         ${tags}
-        <div class="tile-foot">${bar}<div class="tile-ch">${ch}</div></div>
+        <div class="tile-foot">${bar}<div class="tile-ch">${progPlain(n)}</div></div>
       </div>
     </div>`;
   }).join("");
@@ -430,7 +448,6 @@ function openDetail(id){
   const st=STATUSES[n.status]||{label:n.status};
   const p=pct(n);
   const stars=n.rating?`<span class="d-stars">${"★".repeat(n.rating)}</span>`:"";
-  const progText=(n.total&&n.total>0)?`第 <b>${n.current||0}</b> / ${n.total} 章 · ${p}%`:`第 <b>${n.current||0}</b> 章 · 连载中`;
   const bar=(n.total&&n.total>0)?`<div class="bar"><span style="width:${p}%"></span></div>`:"";
   const tags=(n.tags&&n.tags.length)?`<div class="d-tags">${n.tags.map(t=>`<span class="d-tag">${escapeHtml(t)}</span>`).join("")}</div>`:"";
   const link=n.url?`<a class="d-link" href="${escapeAttr(n.url)}" target="_blank" rel="noopener">打开链接 · Open to read ↗</a>`:"";
@@ -445,7 +462,7 @@ function openDetail(id){
         ${n.author?`<div class="detail-author">${escapeHtml(n.author)}</div>`:""}
         <div class="d-prog">
           <button class="qbtn" data-d="dec">–</button>
-          <div class="d-prog-text">${progText}</div>
+          <div class="d-prog-text">${progRich(n)}</div>
           <button class="qbtn" data-d="inc">+</button>
         </div>
         ${bar}${tags}${link}
@@ -474,6 +491,11 @@ async function bump(id,delta){
 }
 
 /* ---------- edit modal ---------- */
+function updateUnitLabels(){
+  const u=document.getElementById('f-unit').value;
+  document.getElementById('lab-current').textContent = u==='page' ? '当前页数 · Current page' : '当前章节 · Current';
+  document.getElementById('lab-total').textContent   = u==='page' ? '总页数 · Total (空白＝未知)' : '总章节 · Total (空白＝连载)';
+}
 function setPreview(url){
   document.getElementById("coverPreview").innerHTML = url ? `<img src="${escapeAttr(url)}" alt="" onerror="this.style.display='none'" />` : "";
 }
@@ -485,12 +507,14 @@ function openModal(id){
   document.getElementById("f-cover").value=n?.cover||"";
   document.getElementById("f-author").value=n?.author||"";
   document.getElementById("f-status").value=n?.status||"reading";
+  document.getElementById("f-unit").value=n?.unit||"chapter";
   document.getElementById("f-current").value=n?.current??"";
   document.getElementById("f-total").value=(n&&n.total!=null)?n.total:"";
   document.getElementById("f-rating").value=n?.rating||0;
   document.getElementById("f-url").value=n?.url||"";
   document.getElementById("f-tags").value=(n?.tags||[]).join(", ");
   document.getElementById("f-notes").value=n?.notes||"";
+  updateUnitLabels();
   setPreview(n?.cover||"");
   document.getElementById("deleteBtn").style.visibility=n?"visible":"hidden";
   document.getElementById("overlay").classList.add("open");
@@ -506,6 +530,7 @@ async function saveModal(){
     title, cover:document.getElementById("f-cover").value.trim(),
     author:document.getElementById("f-author").value.trim(),
     status:document.getElementById("f-status").value,
+    unit:document.getElementById("f-unit").value,
     current:Number(document.getElementById("f-current").value)||0,
     total:totalRaw===""?null:Number(totalRaw),
     rating:Number(document.getElementById("f-rating").value)||0,
@@ -542,7 +567,7 @@ function importData(file){
       if(!Array.isArray(data)) throw new Error("bad");
       if(library.length && !confirm("Merge the imported novels into this shelf?")) return;
       for(const raw of data){
-        const n={id:raw.id||uid(), ...(CLOUD&&currentShelf?{owner_id:currentShelf}:{}), ...raw};
+        const n={id:raw.id||uid(), ...raw};
         if(CLOUD&&currentShelf) n.owner_id=currentShelf;
         if(!library.find(x=>x.id===n.id)) library.push(n);
         await persistNovel(n);
@@ -578,6 +603,7 @@ document.getElementById("addBtn").onclick=()=>openModal();
 document.getElementById("saveBtn").onclick=saveModal;
 document.getElementById("cancelBtn").onclick=closeModal;
 document.getElementById("deleteBtn").onclick=deleteCurrent;
+document.getElementById("f-unit").onchange=updateUnitLabels;
 document.getElementById("overlay").onclick=e=>{ if(e.target.id==="overlay") closeModal(); };
 document.getElementById("detailOverlay").onclick=e=>{ if(e.target.id==="detailOverlay") closeDetail(); };
 document.getElementById("search").oninput=renderGrid;
