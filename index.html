@@ -15,6 +15,7 @@
     --accent:#8B5A6F; --accent-soft:#8B5A6F1a;
     --reading:#8B5A6F; --finished:#5E7C6B; --want:#9A7B4F; --paused:#8C8A86; --dropped:#B0ABA2;
     --shadow:0 1px 2px rgba(43,42,39,0.05), 0 8px 24px rgba(43,42,39,0.06);
+    --shadow-cover:0 2px 4px rgba(43,42,39,0.08), 0 10px 24px rgba(43,42,39,0.10);
     --serif:"Noto Serif SC","Songti SC","SimSun",serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
   }
@@ -23,7 +24,7 @@
   body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:15px;}
   button{font-family:inherit;cursor:pointer;}
   input,select,textarea{font-family:inherit;font-size:14px;}
-  .wrap{max-width:880px;margin:0 auto;padding:56px 24px 120px;}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 24px 120px;}
 
   .masthead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .wordmark{display:flex;align-items:baseline;gap:12px;}
@@ -44,53 +45,39 @@
   .btn-add:hover{opacity:.88;}
   .btn-add:active{transform:translateY(1px);}
 
-  .filters{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+  .filters{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
   .chip{padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font-size:13px;transition:all .15s;}
   .chip:hover{border-color:var(--line-strong);color:var(--ink);}
   .chip.active{background:var(--ink);border-color:var(--ink);color:#fff;}
   .chip .n{opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums;}
 
-  .list{display:flex;flex-direction:column;}
-  .row{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;padding:18px 4px;border-top:1px solid var(--line);position:relative;}
-  .row:last-child{border-bottom:1px solid var(--line);}
-  .row-main{min-width:0;}
-  .title-line{display:flex;align-items:center;gap:10px;}
-  .title{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .title a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;}
-  .title a:hover{border-bottom-color:var(--line-strong);}
-  .pill{flex:none;font-size:11px;padding:2px 9px;border-radius:999px;font-weight:600;letter-spacing:.02em;color:#fff;white-space:nowrap;}
-  .pill.reading{background:var(--reading);}
-  .pill.finished{background:var(--finished);}
-  .pill.want{background:var(--want);}
-  .pill.paused{background:var(--paused);}
-  .pill.dropped{background:var(--dropped);}
-  .meta{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:13px;color:var(--muted);flex-wrap:wrap;}
-  .meta .author{color:var(--ink);}
-  .stars{color:var(--accent);letter-spacing:1px;font-size:12px;}
-  .tags{display:flex;gap:5px;flex-wrap:wrap;}
-  .tag{font-size:11px;padding:1px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent);}
-
-  .progress-wrap{display:flex;align-items:center;gap:12px;justify-self:end;}
-  .prog{width:150px;}
-  .prog .nums{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;margin-bottom:5px;}
-  .prog .nums b{color:var(--ink);font-weight:600;}
-  .bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden;}
-  .bar > span{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s ease;}
-  .ongoing-note{font-size:12px;color:var(--faint);font-style:italic;}
-  .quick{display:flex;gap:4px;}
-  .qbtn{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--muted);font-size:15px;line-height:1;display:grid;place-items:center;transition:all .12s;}
-  .qbtn:hover{border-color:var(--accent);color:var(--accent);}
-  .qbtn:active{transform:translateY(1px);}
-  .row-actions{position:absolute;right:4px;top:14px;display:flex;gap:4px;opacity:0;transition:opacity .15s;}
-  .row:hover .row-actions{opacity:1;}
-  .row-actions button{border:none;background:transparent;color:var(--faint);font-size:12px;padding:3px 7px;border-radius:6px;}
-  .row-actions button:hover{background:var(--line);color:var(--ink);}
+  /* ---- gallery ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:22px 18px;}
+  .tile{cursor:pointer;display:flex;flex-direction:column;transition:transform .12s ease;}
+  .tile:hover{transform:translateY(-3px);}
+  .tile-cover{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow-cover);}
+  .tile-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .cover-ph{width:100%;height:100%;display:grid;place-items:center;padding:16px;text-align:center;background:linear-gradient(155deg,#ffffff 0%,#f3edef 100%);}
+  .cover-ph span{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+  .tile-pill{position:absolute;top:8px;left:8px;font-size:10px;padding:3px 8px;border-radius:999px;font-weight:600;color:#fff;backdrop-filter:blur(2px);}
+  .tile-pill.reading{background:var(--reading);} .tile-pill.finished{background:var(--finished);}
+  .tile-pill.want{background:var(--want);} .tile-pill.paused{background:var(--paused);} .tile-pill.dropped{background:var(--dropped);}
+  .tile-quick{position:absolute;bottom:8px;right:8px;opacity:0;border:none;background:rgba(43,42,39,.82);color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;transition:opacity .14s;backdrop-filter:blur(2px);}
+  .tile:hover .tile-quick{opacity:1;}
+  .tile-quick:hover{background:var(--accent);}
+  .tile-body{padding:9px 2px 0;}
+  .tile-title{font-family:var(--serif);font-weight:600;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .tile-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tile-bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:7px;}
+  .tile-bar > span{display:block;height:100%;background:var(--accent);border-radius:3px;}
+  .tile-ch{font-size:11px;color:var(--faint);margin-top:5px;font-variant-numeric:tabular-nums;}
 
   .empty{text-align:center;padding:80px 20px;color:var(--muted);}
   .empty .mk{font-family:var(--serif);font-size:40px;color:var(--faint);margin-bottom:14px;}
   .empty p{margin:0 0 18px;}
 
-  .overlay{position:fixed;inset:0;background:rgba(43,42,39,0.35);display:none;align-items:flex-start;justify-content:center;padding:60px 20px;z-index:50;overflow-y:auto;}
+  /* ---- overlays ---- */
+  .overlay{position:fixed;inset:0;background:rgba(43,42,39,0.40);display:none;align-items:flex-start;justify-content:center;padding:56px 20px;z-index:50;overflow-y:auto;}
   .overlay.open{display:flex;}
   .modal{width:100%;max-width:520px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:28px;animation:rise .2s ease;}
   @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
@@ -101,22 +88,53 @@
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);background:var(--surface);}
   .field textarea{resize:vertical;min-height:60px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .cover-row{display:flex;gap:8px;}
+  .cover-row input{flex:1;}
+  .cover-preview{margin-top:10px;}
+  .cover-preview img{width:84px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:var(--shadow);}
   .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
   .modal-actions .right{display:flex;gap:8px;}
-  .btn-ghost{padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);}
+  .btn-ghost{padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);white-space:nowrap;}
   .btn-ghost:hover{border-color:var(--line-strong);}
+  .btn-ghost:disabled{opacity:.5;cursor:default;}
   .btn-primary{padding:9px 18px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-weight:500;}
   .btn-primary:hover{opacity:.9;}
   .btn-danger{padding:9px 12px;border:none;border-radius:8px;background:transparent;color:#B5544C;font-size:13px;}
   .btn-danger:hover{background:#B5544C12;}
 
-  .backup{margin-top:40px;display:flex;gap:8px;justify-content:center;align-items:center;font-size:13px;flex-wrap:wrap;}
+  /* ---- detail view ---- */
+  .detail{max-width:580px;}
+  .detail-top{display:flex;gap:22px;}
+  .detail-cover{width:160px;flex:none;aspect-ratio:3/4;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-cover);}
+  .detail-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .detail-info{min-width:0;flex:1;}
+  .detail-info h2{font-family:var(--serif);font-size:23px;margin:2px 0 4px;font-weight:600;line-height:1.25;}
+  .detail-author{color:var(--muted);font-size:14px;margin-bottom:12px;}
+  .pill{display:inline-block;font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600;color:#fff;}
+  .pill.reading{background:var(--reading);} .pill.finished{background:var(--finished);}
+  .pill.want{background:var(--want);} .pill.paused{background:var(--paused);} .pill.dropped{background:var(--dropped);}
+  .d-stars{color:var(--accent);letter-spacing:2px;font-size:14px;margin-left:8px;}
+  .d-prog{display:flex;align-items:center;gap:10px;margin-top:16px;}
+  .d-prog-text{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .d-prog-text b{font-weight:600;}
+  .qbtn{width:30px;height:30px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--muted);font-size:17px;line-height:1;display:grid;place-items:center;transition:all .12s;}
+  .qbtn:hover{border-color:var(--accent);color:var(--accent);}
+  .qbtn:active{transform:translateY(1px);}
+  .bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:12px;}
+  .bar > span{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .25s ease;}
+  .d-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px;}
+  .d-tag{font-size:12px;padding:2px 9px;border-radius:6px;background:var(--accent-soft);color:var(--accent);}
+  .d-link{display:inline-block;margin-top:16px;font-size:13px;color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft);}
+  .d-link:hover{border-bottom-color:var(--accent);}
+  .d-notes{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink);white-space:pre-wrap;line-height:1.6;}
+  .detail-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:24px;}
+
+  /* ---- backup + auth ---- */
+  .backup{margin-top:44px;display:flex;gap:8px;justify-content:center;align-items:center;font-size:13px;flex-wrap:wrap;}
   .backup button{border:none;background:transparent;color:var(--muted);padding:6px 10px;border-radius:6px;}
   .backup button:hover{color:var(--ink);background:var(--line);}
   .backup .sep{color:var(--faint);}
   .mode-tag{font-size:11px;color:var(--faint);border:1px solid var(--line);padding:2px 8px;border-radius:999px;}
-
-  /* auth gate */
   .gate{position:fixed;inset:0;background:var(--paper);display:none;align-items:center;justify-content:center;padding:24px;z-index:60;}
   .gate.open{display:flex;}
   .gate-card{width:100%;max-width:360px;text-align:center;}
@@ -129,10 +147,10 @@
 
   @media (max-width:620px){
     .wrap{padding:40px 18px 100px;}
-    .row{grid-template-columns:1fr;gap:12px;}
-    .progress-wrap{justify-self:start;}
-    .prog{width:100%;}
-    .row-actions{position:static;opacity:1;margin-top:4px;}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px 14px;}
+    .detail-top{flex-direction:column;align-items:center;text-align:center;}
+    .detail-cover{width:150px;}
+    .d-prog,.d-tags,.detail-actions{justify-content:center;}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
@@ -140,8 +158,9 @@
 <body>
 
 <!-- ====================================================================== -->
-<!--  SET-UP: to turn on cloud sync, paste your two Supabase values below.   -->
-<!--  Leave them as-is to run locally (saves only in this browser).          -->
+<!--  SET-UP: paste your two Supabase values below to keep cloud sync on.    -->
+<!--  (Same values you used before — copy them from your old index.html.)    -->
+<!--  Leave them as-is to run locally instead.                               -->
 <!-- ====================================================================== -->
 <script>
   const CONFIG = {
@@ -171,7 +190,7 @@
   </div>
 
   <div class="filters" id="filters"></div>
-  <div class="list" id="list"></div>
+  <div id="list"></div>
 
   <div class="backup">
     <span class="mode-tag" id="modeTag"></span>
@@ -185,11 +204,23 @@
   </div>
 </div>
 
+<!-- detail view -->
+<div class="overlay" id="detailOverlay"><div class="modal detail" id="detailCard"></div></div>
+
 <!-- add / edit modal -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2 id="modalTitle">Add novel</h2>
     <div class="field"><label>标题 · Title</label><input id="f-title" type="text" placeholder="例如：撒野" /></div>
+    <div class="field">
+      <label>封面 · Cover (paste a link, or upload)</label>
+      <div class="cover-row">
+        <input id="f-cover" type="url" placeholder="https://…" />
+        <button type="button" class="btn-ghost" id="uploadBtn">Upload</button>
+        <input type="file" id="coverFile" accept="image/*" hidden />
+      </div>
+      <div class="cover-preview" id="coverPreview"></div>
+    </div>
     <div class="row2">
       <div class="field"><label>作者 · Author</label><input id="f-author" type="text" placeholder="作者名" /></div>
       <div class="field"><label>状态 · Status</label>
@@ -227,7 +258,7 @@
   </div>
 </div>
 
-<!-- login gate (cloud mode only) -->
+<!-- login gate -->
 <div class="gate" id="gate">
   <div class="gate-card">
     <div class="cn">书架</div>
@@ -240,29 +271,25 @@
 </div>
 
 <script>
-const STATUSES = {
-  reading:{label:"在读"}, finished:{label:"读完"}, want:{label:"想读"}, paused:{label:"暂停"}, dropped:{label:"弃文"}
-};
+const STATUSES = {reading:{label:"在读"},finished:{label:"读完"},want:{label:"想读"},paused:{label:"暂停"},dropped:{label:"弃文"}};
 const LOCAL_KEY = "danmei.library.v1";
 const CLOUD = typeof CONFIG.SUPABASE_URL === "string" && CONFIG.SUPABASE_URL.startsWith("http");
 
-let sb = null;
-let library = [];
-let activeFilter = "all";
-let editingId = null;
+let sb=null, library=[], activeFilter="all", editingId=null;
 
 function uid(){
   if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3|0x8)).toString(16);});
 }
 function escapeHtml(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function escapeAttr(s){return escapeHtml(s);}
 function pct(n){ if(!n.total||n.total<=0) return null; return Math.min(100,Math.round((n.current/n.total)*100)); }
 function tval(x){ const t=Date.parse(x.updated); return isNaN(t)?(Number(x.updated)||0):t; }
 
-/* ---------- data layer: works in cloud OR local mode ---------- */
+/* ---------- data layer ---------- */
 function toRow(n){
   return {
-    id:n.id, title:n.title, author:n.author||null, status:n.status,
+    id:n.id, title:n.title, author:n.author||null, status:n.status, cover:n.cover||null,
     current:Number(n.current)||0,
     total:(n.total===null||n.total===undefined||n.total==="")?null:Number(n.total),
     rating:Number(n.rating)||0, url:n.url||null, tags:n.tags||[], notes:n.notes||null,
@@ -271,39 +298,41 @@ function toRow(n){
 }
 function saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(library)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(LOCAL_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
-
 async function dataLoad(){
   if(CLOUD){
-    const {data,error} = await sb.from('novels').select('*');
+    const {data,error}=await sb.from('novels').select('*');
     if(error){ alert("Couldn't load your shelf: "+error.message); return; }
-    library = data||[];
-  }else{
-    library = loadLocal();
-  }
+    library=data||[];
+  }else{ library=loadLocal(); }
 }
 async function persistNovel(n){
-  if(CLOUD){
-    const {error} = await sb.from('novels').upsert(toRow(n));
-    if(error) alert("Save didn't go through: "+error.message);
-  }else{ saveLocal(); }
+  if(CLOUD){ const {error}=await sb.from('novels').upsert(toRow(n)); if(error) alert("Save didn't go through: "+error.message); }
+  else{ saveLocal(); }
 }
 async function removeNovel(id){
+  if(CLOUD){ const {error}=await sb.from('novels').delete().eq('id',id); if(error) alert("Delete didn't go through: "+error.message); }
+  else{ saveLocal(); }
+}
+async function uploadCover(file){
   if(CLOUD){
-    const {error} = await sb.from('novels').delete().eq('id',id);
-    if(error) alert("Delete didn't go through: "+error.message);
-  }else{ saveLocal(); }
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`${uid()}.${ext}`;
+    const {error}=await sb.storage.from('covers').upload(path,file,{cacheControl:'3600',upsert:false});
+    if(error){ alert("Upload failed: "+error.message+"\n(Did you run the optional storage step in the covers SQL?)"); return null; }
+    return sb.storage.from('covers').getPublicUrl(path).data.publicUrl;
+  }else{
+    return await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+  }
 }
 
 /* ---------- render ---------- */
-function render(){ renderStats(); renderFilters(); renderList(); }
-
+function render(){ renderStats(); renderFilters(); renderGrid(); }
 function renderStats(){
-  const total=library.length;
-  const reading=library.filter(n=>n.status==="reading").length;
+  const total=library.length, reading=library.filter(n=>n.status==="reading").length;
   const chapters=library.reduce((s,n)=>s+(Number(n.current)||0),0);
   const el=document.getElementById("statLine");
-  if(total===0){ el.innerHTML=""; return; }
-  el.innerHTML=`<b>${total}</b> ${total===1?"novel":"novels"}<span class="dot">·</span><b>${reading}</b> reading<span class="dot">·</span><b>${chapters.toLocaleString()}</b> chapters logged`;
+  el.innerHTML = total===0 ? "" :
+    `<b>${total}</b> ${total===1?"novel":"novels"}<span class="dot">·</span><b>${reading}</b> reading<span class="dot">·</span><b>${chapters.toLocaleString()}</b> chapters logged`;
 }
 function renderFilters(){
   const counts={all:library.length};
@@ -312,7 +341,7 @@ function renderFilters(){
   const labels={all:"All",reading:"在读",finished:"读完",want:"想读",paused:"暂停",dropped:"弃文"};
   const box=document.getElementById("filters");
   box.innerHTML=order.map(k=>`<button class="chip ${activeFilter===k?"active":""}" data-filter="${k}">${labels[k]}<span class="n">${counts[k]||0}</span></button>`).join("");
-  box.querySelectorAll(".chip").forEach(c=>{ c.onclick=()=>{activeFilter=c.dataset.filter;render();}; });
+  box.querySelectorAll(".chip").forEach(c=>{ c.onclick=()=>{activeFilter=c.dataset.filter;renderGrid();renderFilters();}; });
 }
 function currentView(){
   const q=document.getElementById("search").value.trim().toLowerCase();
@@ -328,55 +357,105 @@ function currentView(){
   });
   return items;
 }
-function renderList(){
+function coverHtml(n){
+  if(n.cover) return `<img src="${escapeAttr(n.cover)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<div class=&quot;cover-ph&quot;><span>'+${JSON.stringify(escapeHtml(n.title))}+'</span></div>'" />`;
+  return `<div class="cover-ph"><span>${escapeHtml(n.title)}</span></div>`;
+}
+function renderGrid(){
   const list=document.getElementById("list");
   const items=currentView();
   if(library.length===0){
-    list.innerHTML=`<div class="empty"><div class="mk">书</div><p>Your shelf is empty. Add the first novel you're reading.</p><button class="btn-add" onclick="openModal()">+ Add novel</button></div>`;
+    list.className=""; list.innerHTML=`<div class="empty"><div class="mk">书</div><p>Your shelf is empty. Add the first novel you're reading.</p><button class="btn-add" onclick="openModal()">+ Add novel</button></div>`;
     return;
   }
-  if(items.length===0){ list.innerHTML=`<div class="empty"><p>No novels match that.</p></div>`; return; }
+  if(items.length===0){ list.className=""; list.innerHTML=`<div class="empty"><p>No novels match that.</p></div>`; return; }
+  list.className="grid";
   list.innerHTML=items.map(n=>{
     const p=pct(n), st=STATUSES[n.status]||{label:n.status};
-    const stars=n.rating?`<span class="stars">${"★".repeat(n.rating)}</span>`:"";
-    const tags=(n.tags&&n.tags.length)?`<span class="tags">${n.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</span>`:"";
-    const titleHtml=n.url?`<a href="${escapeHtml(n.url)}" target="_blank" rel="noopener">${escapeHtml(n.title)}</a>`:escapeHtml(n.title);
-    const progTop=(n.total&&n.total>0)?`<span>第 <b>${n.current||0}</b> / ${n.total} 章</span><span>${p}%</span>`:`<span class="ongoing-note">第 ${n.current||0} 章 · 连载中</span>`;
-    const bar=(n.total&&n.total>0)?`<div class="bar"><span style="width:${p}%"></span></div>`:"";
-    return `<div class="row" data-id="${n.id}">
-      <div class="row-main">
-        <div class="title-line"><span class="title">${titleHtml}</span><span class="pill ${n.status}">${st.label}</span></div>
-        <div class="meta">${n.author?`<span class="author">${escapeHtml(n.author)}</span>`:""}${stars}${tags}</div>
+    const bar=(n.total&&n.total>0)?`<div class="tile-bar"><span style="width:${p}%"></span></div>`:"";
+    const ch=(n.total&&n.total>0)?`第 ${n.current||0} / ${n.total} 章`:`第 ${n.current||0} 章 · 连载`;
+    const sub=n.author?escapeHtml(n.author):"&nbsp;";
+    return `<div class="tile" data-id="${n.id}">
+      <div class="tile-cover">
+        ${coverHtml(n)}
+        <span class="tile-pill ${n.status}">${st.label}</span>
+        <button class="tile-quick" data-act="inc" title="+1 chapter">+1 章</button>
       </div>
-      <div class="progress-wrap">
-        <div class="prog"><div class="nums">${progTop}</div>${bar}</div>
-        <div class="quick"><button class="qbtn" data-act="dec" title="-1 chapter">–</button><button class="qbtn" data-act="inc" title="+1 chapter">+</button></div>
+      <div class="tile-body">
+        <div class="tile-title">${escapeHtml(n.title)}</div>
+        <div class="tile-sub">${sub}</div>
+        ${bar}
+        <div class="tile-ch">${ch}</div>
       </div>
-      <div class="row-actions"><button data-act="edit">Edit</button></div>
     </div>`;
   }).join("");
-  list.querySelectorAll(".row").forEach(row=>{
-    const id=row.dataset.id;
-    row.querySelector('[data-act="inc"]').onclick=()=>bump(id,+1);
-    row.querySelector('[data-act="dec"]').onclick=()=>bump(id,-1);
-    row.querySelector('[data-act="edit"]').onclick=()=>openModal(id);
+  list.querySelectorAll(".tile").forEach(t=>{
+    const id=t.dataset.id;
+    t.onclick=()=>openDetail(id);
+    t.querySelector('[data-act="inc"]').onclick=(e)=>{ e.stopPropagation(); bump(id,+1); };
   });
 }
+
+/* ---------- detail view ---------- */
+function openDetail(id){
+  const n=library.find(x=>x.id===id); if(!n) return;
+  const st=STATUSES[n.status]||{label:n.status};
+  const p=pct(n);
+  const stars=n.rating?`<span class="d-stars">${"★".repeat(n.rating)}</span>`:"";
+  const progText=(n.total&&n.total>0)?`第 <b>${n.current||0}</b> / ${n.total} 章 · ${p}%`:`第 <b>${n.current||0}</b> 章 · 连载中`;
+  const bar=(n.total&&n.total>0)?`<div class="bar"><span style="width:${p}%"></span></div>`:"";
+  const tags=(n.tags&&n.tags.length)?`<div class="d-tags">${n.tags.map(t=>`<span class="d-tag">${escapeHtml(t)}</span>`).join("")}</div>`:"";
+  const link=n.url?`<a class="d-link" href="${escapeAttr(n.url)}" target="_blank" rel="noopener">打开链接 · Open to read ↗</a>`:"";
+  const notes=n.notes?`<div class="d-notes">${escapeHtml(n.notes)}</div>`:"";
+  document.getElementById("detailCard").innerHTML=`
+    <div class="detail-top">
+      <div class="detail-cover">${coverHtml(n)}</div>
+      <div class="detail-info">
+        <span class="pill ${n.status}">${st.label}</span>${stars}
+        <h2>${escapeHtml(n.title)}</h2>
+        ${n.author?`<div class="detail-author">${escapeHtml(n.author)}</div>`:""}
+        <div class="d-prog">
+          <button class="qbtn" data-d="dec">–</button>
+          <div class="d-prog-text">${progText}</div>
+          <button class="qbtn" data-d="inc">+</button>
+        </div>
+        ${bar}
+        ${tags}
+        ${link}
+      </div>
+    </div>
+    ${notes}
+    <div class="detail-actions">
+      <button class="btn-ghost" id="detailClose">Close</button>
+      <button class="btn-primary" id="detailEdit">Edit</button>
+    </div>`;
+  const card=document.getElementById("detailCard");
+  card.querySelector('[data-d="inc"]').onclick=async()=>{ await bump(id,+1); openDetail(id); };
+  card.querySelector('[data-d="dec"]').onclick=async()=>{ await bump(id,-1); openDetail(id); };
+  card.querySelector('#detailClose').onclick=closeDetail;
+  card.querySelector('#detailEdit').onclick=()=>{ closeDetail(); openModal(id); };
+  document.getElementById("detailOverlay").classList.add("open");
+}
+function closeDetail(){ document.getElementById("detailOverlay").classList.remove("open"); }
 
 async function bump(id,delta){
   const n=library.find(x=>x.id===id); if(!n) return;
   n.current=Math.max(0,(Number(n.current)||0)+delta);
   n.updated=new Date().toISOString();
-  render();
+  renderGrid(); renderStats();
   await persistNovel(n);
 }
 
-/* ---------- modal ---------- */
+/* ---------- edit modal ---------- */
+function setPreview(url){
+  document.getElementById("coverPreview").innerHTML = url ? `<img src="${escapeAttr(url)}" alt="" onerror="this.style.display='none'" />` : "";
+}
 function openModal(id){
   editingId=id||null;
   const n=id?library.find(x=>x.id===id):null;
   document.getElementById("modalTitle").textContent=n?"Edit novel":"Add novel";
   document.getElementById("f-title").value=n?.title||"";
+  document.getElementById("f-cover").value=n?.cover||"";
   document.getElementById("f-author").value=n?.author||"";
   document.getElementById("f-status").value=n?.status||"reading";
   document.getElementById("f-current").value=n?.current??"";
@@ -385,6 +464,7 @@ function openModal(id){
   document.getElementById("f-url").value=n?.url||"";
   document.getElementById("f-tags").value=(n?.tags||[]).join(", ");
   document.getElementById("f-notes").value=n?.notes||"";
+  setPreview(n?.cover||"");
   document.getElementById("deleteBtn").style.visibility=n?"visible":"hidden";
   document.getElementById("overlay").classList.add("open");
   setTimeout(()=>document.getElementById("f-title").focus(),50);
@@ -396,7 +476,8 @@ async function saveModal(){
   const tags=document.getElementById("f-tags").value.split(",").map(t=>t.trim()).filter(Boolean);
   const totalRaw=document.getElementById("f-total").value;
   const data={
-    title, author:document.getElementById("f-author").value.trim(),
+    title, cover:document.getElementById("f-cover").value.trim(),
+    author:document.getElementById("f-author").value.trim(),
     status:document.getElementById("f-status").value,
     current:Number(document.getElementById("f-current").value)||0,
     total:totalRaw===""?null:Number(totalRaw),
@@ -414,8 +495,7 @@ async function saveModal(){
 async function deleteCurrent(){
   if(!editingId) return;
   if(!confirm("Remove this novel from your shelf?")) return;
-  const id=editingId;
-  library=library.filter(x=>x.id!==id);
+  const id=editingId; library=library.filter(x=>x.id!==id);
   render(); closeModal();
   await removeNovel(id);
 }
@@ -424,8 +504,7 @@ async function deleteCurrent(){
 function exportData(){
   const blob=new Blob([JSON.stringify(library,null,2)],{type:"application/json"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=`danmei-library-${new Date().toISOString().slice(0,10)}.json`;
+  a.href=URL.createObjectURL(blob); a.download=`danmei-library-${new Date().toISOString().slice(0,10)}.json`;
   a.click(); URL.revokeObjectURL(a.href);
 }
 function importData(file){
@@ -435,23 +514,18 @@ function importData(file){
       const data=JSON.parse(reader.result);
       if(!Array.isArray(data)) throw new Error("bad");
       if(library.length && !confirm("Merge the imported novels into your shelf?")) return;
-      for(const raw of data){
-        const n={id:raw.id||uid(),...raw};
-        if(!library.find(x=>x.id===n.id)) library.push(n);
-        await persistNovel(n);
-      }
+      for(const raw of data){ const n={id:raw.id||uid(),...raw}; if(!library.find(x=>x.id===n.id)) library.push(n); await persistNovel(n); }
       render();
     }catch(e){ alert("That file couldn't be read as a backup."); }
   };
   reader.readAsText(file);
 }
 
-/* ---------- auth (cloud mode) ---------- */
+/* ---------- auth ---------- */
 function showGate(){ document.getElementById("gate").classList.add("open"); setTimeout(()=>document.getElementById("g-email").focus(),50); }
 function hideGate(){ document.getElementById("gate").classList.remove("open"); }
 async function doLogin(){
-  const email=document.getElementById("g-email").value.trim();
-  const password=document.getElementById("g-pass").value;
+  const email=document.getElementById("g-email").value.trim(), password=document.getElementById("g-pass").value;
   const msg=document.getElementById("gateMsg"); msg.textContent="";
   const {error}=await sb.auth.signInWithPassword({email,password});
   if(error){ msg.textContent=error.message; return; }
@@ -466,16 +540,26 @@ document.getElementById("saveBtn").onclick=saveModal;
 document.getElementById("cancelBtn").onclick=closeModal;
 document.getElementById("deleteBtn").onclick=deleteCurrent;
 document.getElementById("overlay").onclick=e=>{ if(e.target.id==="overlay") closeModal(); };
-document.getElementById("search").oninput=render;
-document.getElementById("sort").onchange=render;
+document.getElementById("detailOverlay").onclick=e=>{ if(e.target.id==="detailOverlay") closeDetail(); };
+document.getElementById("search").oninput=renderGrid;
+document.getElementById("sort").onchange=renderGrid;
 document.getElementById("exportBtn").onclick=exportData;
 document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=""; };
+document.getElementById("f-cover").addEventListener("input",e=>setPreview(e.target.value.trim()));
+document.getElementById("uploadBtn").onclick=()=>document.getElementById("coverFile").click();
+document.getElementById("coverFile").onchange=async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const btn=document.getElementById("uploadBtn"); const old=btn.textContent; btn.textContent="Uploading…"; btn.disabled=true;
+  const url=await uploadCover(file);
+  btn.textContent=old; btn.disabled=false; e.target.value="";
+  if(url){ document.getElementById("f-cover").value=url; setPreview(url); }
+};
 document.getElementById("loginBtn").onclick=doLogin;
 document.getElementById("g-pass").addEventListener("keydown",e=>{ if(e.key==="Enter") doLogin(); });
 document.getElementById("signoutBtn").onclick=signOut;
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape") closeModal();
+  if(e.key==="Escape"){ closeModal(); closeDetail(); }
   if((e.metaKey||e.ctrlKey)&&e.key==="Enter"&&document.getElementById("overlay").classList.contains("open")) saveModal();
 });
 
@@ -485,12 +569,10 @@ document.addEventListener("keydown",e=>{
   if(CLOUD){
     document.getElementById("signoutBtn").style.display="";
     document.getElementById("signoutSep").style.display="";
-    sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-    const {data:{session}} = await sb.auth.getSession();
+    sb=supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    const {data:{session}}=await sb.auth.getSession();
     if(session){ await afterAuth(); } else { showGate(); }
-  }else{
-    await dataLoad(); render();
-  }
+  }else{ await dataLoad(); render(); }
 })();
 </script>
 </body>
