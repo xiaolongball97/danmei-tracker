@@ -15,7 +15,7 @@
     --accent:#8B5A6F; --accent-soft:#8B5A6F1a;
     --reading:#8B5A6F; --finished:#5E7C6B; --want:#9A7B4F; --paused:#8C8A86; --dropped:#B0ABA2;
     --shadow:0 1px 2px rgba(43,42,39,0.05), 0 8px 24px rgba(43,42,39,0.06);
-    --shadow-cover:0 2px 4px rgba(43,42,39,0.08), 0 10px 24px rgba(43,42,39,0.10);
+    --shadow-cover:0 2px 4px rgba(43,42,39,0.08), 0 12px 28px rgba(43,42,39,0.12);
     --serif:"Noto Serif SC","Songti SC","SimSun",serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
   }
@@ -24,7 +24,7 @@
   body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:15px;}
   button{font-family:inherit;cursor:pointer;}
   input,select,textarea{font-family:inherit;font-size:14px;}
-  .wrap{max-width:960px;margin:0 auto;padding:56px 24px 120px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:56px 28px 120px;}
 
   .masthead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .wordmark{display:flex;align-items:baseline;gap:12px;}
@@ -51,26 +51,29 @@
   .chip.active{background:var(--ink);border-color:var(--ink);color:#fff;}
   .chip .n{opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums;}
 
-  /* ---- gallery ---- */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:22px 18px;}
-  .tile{cursor:pointer;display:flex;flex-direction:column;transition:transform .12s ease;}
-  .tile:hover{transform:translateY(-3px);}
-  .tile-cover{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow-cover);}
-  .tile-cover img{width:100%;height:100%;object-fit:cover;display:block;}
-  .cover-ph{width:100%;height:100%;display:grid;place-items:center;padding:16px;text-align:center;background:linear-gradient(155deg,#ffffff 0%,#f3edef 100%);}
-  .cover-ph span{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
-  .tile-pill{position:absolute;top:8px;left:8px;font-size:10px;padding:3px 8px;border-radius:999px;font-weight:600;color:#fff;backdrop-filter:blur(2px);}
+  /* ---- gallery cards ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
+  .tile{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;transition:transform .14s ease, box-shadow .18s ease;}
+  .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-cover);}
+  .tile-cover{position:relative;aspect-ratio:4/3;overflow:hidden;background:linear-gradient(155deg,#ffffff 0%,#f3edef 100%);}
+  .tile-cover img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+  .cover-ph{width:100%;height:100%;display:grid;place-items:center;padding:20px;text-align:center;background:linear-gradient(155deg,#ffffff 0%,#f3edef 100%);}
+  .cover-ph span{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .tile-pill{position:absolute;top:10px;left:10px;font-size:11px;padding:3px 9px;border-radius:999px;font-weight:600;color:#fff;backdrop-filter:blur(2px);box-shadow:0 1px 3px rgba(0,0,0,.15);}
   .tile-pill.reading{background:var(--reading);} .tile-pill.finished{background:var(--finished);}
   .tile-pill.want{background:var(--want);} .tile-pill.paused{background:var(--paused);} .tile-pill.dropped{background:var(--dropped);}
-  .tile-quick{position:absolute;bottom:8px;right:8px;opacity:0;border:none;background:rgba(43,42,39,.82);color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;transition:opacity .14s;backdrop-filter:blur(2px);}
+  .tile-quick{position:absolute;bottom:10px;right:10px;opacity:0;border:none;background:rgba(43,42,39,.82);color:#fff;font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;transition:opacity .14s;backdrop-filter:blur(2px);}
   .tile:hover .tile-quick{opacity:1;}
   .tile-quick:hover{background:var(--accent);}
-  .tile-body{padding:9px 2px 0;}
-  .tile-title{font-family:var(--serif);font-weight:600;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .tile-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tile-bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:7px;}
-  .tile-bar > span{display:block;height:100%;background:var(--accent);border-radius:3px;}
-  .tile-ch{font-size:11px;color:var(--faint);margin-top:5px;font-variant-numeric:tabular-nums;}
+  .tile-body{padding:15px 17px 17px;flex:1;display:flex;flex-direction:column;}
+  .tile-title{font-family:var(--serif);font-weight:600;font-size:17px;line-height:1.32;color:var(--ink);}
+  .tile-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+  .tile-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px;}
+  .tile-tag{font-size:11px;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent);}
+  .tile-foot{margin-top:auto;padding-top:14px;}
+  .tile-bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;}
+  .tile-bar > span{display:block;height:100%;background:var(--accent);border-radius:4px;}
+  .tile-ch{font-size:12px;color:var(--faint);margin-top:7px;font-variant-numeric:tabular-nums;}
 
   .empty{text-align:center;padding:80px 20px;color:var(--muted);}
   .empty .mk{font-family:var(--serif);font-size:40px;color:var(--faint);margin-bottom:14px;}
@@ -91,7 +94,7 @@
   .cover-row{display:flex;gap:8px;}
   .cover-row input{flex:1;}
   .cover-preview{margin-top:10px;}
-  .cover-preview img{width:84px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:var(--shadow);}
+  .cover-preview img{width:120px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:var(--shadow);}
   .modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:22px;}
   .modal-actions .right{display:flex;gap:8px;}
   .btn-ghost{padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);white-space:nowrap;}
@@ -105,7 +108,7 @@
   /* ---- detail view ---- */
   .detail{max-width:580px;}
   .detail-top{display:flex;gap:22px;}
-  .detail-cover{width:160px;flex:none;aspect-ratio:3/4;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-cover);}
+  .detail-cover{width:170px;flex:none;aspect-ratio:3/4;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-cover);background:linear-gradient(155deg,#fff,#f3edef);}
   .detail-cover img{width:100%;height:100%;object-fit:cover;display:block;}
   .detail-info{min-width:0;flex:1;}
   .detail-info h2{font-family:var(--serif);font-size:23px;margin:2px 0 4px;font-weight:600;line-height:1.25;}
@@ -145,11 +148,10 @@
   .gate-card .btn-primary{width:100%;margin-top:6px;padding:11px;}
   .gate-msg{font-size:13px;color:#B5544C;min-height:18px;margin-top:12px;}
 
-  @media (max-width:620px){
+  @media (max-width:560px){
     .wrap{padding:40px 18px 100px;}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px 14px;}
+    .grid{grid-template-columns:1fr;}
     .detail-top{flex-direction:column;align-items:center;text-align:center;}
-    .detail-cover{width:150px;}
     .d-prog,.d-tags,.detail-actions{justify-content:center;}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
@@ -159,7 +161,6 @@
 
 <!-- ====================================================================== -->
 <!--  SET-UP: paste your two Supabase values below to keep cloud sync on.    -->
-<!--  (Same values you used before — copy them from your old index.html.)    -->
 <!--  Leave them as-is to run locally instead.                               -->
 <!-- ====================================================================== -->
 <script>
@@ -325,6 +326,21 @@ async function uploadCover(file){
   }
 }
 
+/* ---------- covers (safe fallback, no inline-string mess) ---------- */
+function coverMarkup(n){
+  if(n.cover) return `<img class="cover-img" src="${escapeAttr(n.cover)}" data-ph="${escapeAttr(n.title)}" alt="" loading="lazy" />`;
+  return `<div class="cover-ph"><span>${escapeHtml(n.title)}</span></div>`;
+}
+function wireCovers(scope){
+  scope.querySelectorAll('img.cover-img').forEach(img=>{
+    img.addEventListener('error',function(){
+      const ph=document.createElement('div'); ph.className='cover-ph';
+      const sp=document.createElement('span'); sp.textContent=this.dataset.ph||'';
+      ph.appendChild(sp); this.replaceWith(ph);
+    });
+  });
+}
+
 /* ---------- render ---------- */
 function render(){ renderStats(); renderFilters(); renderGrid(); }
 function renderStats(){
@@ -357,10 +373,6 @@ function currentView(){
   });
   return items;
 }
-function coverHtml(n){
-  if(n.cover) return `<img src="${escapeAttr(n.cover)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<div class=&quot;cover-ph&quot;><span>'+${JSON.stringify(escapeHtml(n.title))}+'</span></div>'" />`;
-  return `<div class="cover-ph"><span>${escapeHtml(n.title)}</span></div>`;
-}
 function renderGrid(){
   const list=document.getElementById("list");
   const items=currentView();
@@ -373,22 +385,23 @@ function renderGrid(){
   list.innerHTML=items.map(n=>{
     const p=pct(n), st=STATUSES[n.status]||{label:n.status};
     const bar=(n.total&&n.total>0)?`<div class="tile-bar"><span style="width:${p}%"></span></div>`:"";
-    const ch=(n.total&&n.total>0)?`第 ${n.current||0} / ${n.total} 章`:`第 ${n.current||0} 章 · 连载`;
-    const sub=n.author?escapeHtml(n.author):"&nbsp;";
+    const ch=(n.total&&n.total>0)?`第 ${n.current||0} / ${n.total} 章 · ${p}%`:`第 ${n.current||0} 章 · 连载中`;
+    const tags=(n.tags&&n.tags.length)?`<div class="tile-tags">${n.tags.slice(0,4).map(t=>`<span class="tile-tag">${escapeHtml(t)}</span>`).join("")}</div>`:"";
     return `<div class="tile" data-id="${n.id}">
       <div class="tile-cover">
-        ${coverHtml(n)}
+        ${coverMarkup(n)}
         <span class="tile-pill ${n.status}">${st.label}</span>
         <button class="tile-quick" data-act="inc" title="+1 chapter">+1 章</button>
       </div>
       <div class="tile-body">
         <div class="tile-title">${escapeHtml(n.title)}</div>
-        <div class="tile-sub">${sub}</div>
-        ${bar}
-        <div class="tile-ch">${ch}</div>
+        ${n.author?`<div class="tile-sub">${escapeHtml(n.author)}</div>`:""}
+        ${tags}
+        <div class="tile-foot">${bar}<div class="tile-ch">${ch}</div></div>
       </div>
     </div>`;
   }).join("");
+  wireCovers(list);
   list.querySelectorAll(".tile").forEach(t=>{
     const id=t.dataset.id;
     t.onclick=()=>openDetail(id);
@@ -407,9 +420,10 @@ function openDetail(id){
   const tags=(n.tags&&n.tags.length)?`<div class="d-tags">${n.tags.map(t=>`<span class="d-tag">${escapeHtml(t)}</span>`).join("")}</div>`:"";
   const link=n.url?`<a class="d-link" href="${escapeAttr(n.url)}" target="_blank" rel="noopener">打开链接 · Open to read ↗</a>`:"";
   const notes=n.notes?`<div class="d-notes">${escapeHtml(n.notes)}</div>`:"";
-  document.getElementById("detailCard").innerHTML=`
+  const card=document.getElementById("detailCard");
+  card.innerHTML=`
     <div class="detail-top">
-      <div class="detail-cover">${coverHtml(n)}</div>
+      <div class="detail-cover">${coverMarkup(n)}</div>
       <div class="detail-info">
         <span class="pill ${n.status}">${st.label}</span>${stars}
         <h2>${escapeHtml(n.title)}</h2>
@@ -429,7 +443,7 @@ function openDetail(id){
       <button class="btn-ghost" id="detailClose">Close</button>
       <button class="btn-primary" id="detailEdit">Edit</button>
     </div>`;
-  const card=document.getElementById("detailCard");
+  wireCovers(card);
   card.querySelector('[data-d="inc"]').onclick=async()=>{ await bump(id,+1); openDetail(id); };
   card.querySelector('[data-d="dec"]').onclick=async()=>{ await bump(id,-1); openDetail(id); };
   card.querySelector('#detailClose').onclick=closeDetail;
